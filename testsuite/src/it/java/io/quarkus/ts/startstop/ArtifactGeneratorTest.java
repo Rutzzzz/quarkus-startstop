@@ -141,14 +141,14 @@ public class ArtifactGeneratorTest {
             "spring-web",
     };
 
-    public void testRuntime(TestInfo testInfo, String[] extensions, Set<TestFlags> flags) throws Exception {
+    public void testRuntime(TestInfo testInfo, String[] extensions, Set<TestFlags> flags, File baseDir) throws Exception {
         Process pA = null;
         File buildLogA = null;
         File runLogA = null;
         StringBuilder whatIDidReport = new StringBuilder();
         String cn = testInfo.getTestClass().get().getCanonicalName();
         String mn = testInfo.getTestMethod().get().getName();
-        File appBaseDir = new File(getArtifactGeneBaseDir());
+        File appBaseDir = baseDir;
         File appDir = new File(appBaseDir, Apps.GENERATED_SKELETON.dir);
         String logsDir = appBaseDir.getAbsolutePath() + File.separator + Apps.GENERATED_SKELETON.dir + "-logs";
         List<String> generatorCmd = getGeneratorCommand(MvnCmds.GENERATOR.mvnCmds[0], extensions);
@@ -271,13 +271,27 @@ public class ArtifactGeneratorTest {
 
     @Test
     public void manyExtensionsSetA(TestInfo testInfo) throws Exception {
-        testRuntime(testInfo, supportedExtensionsSubsetSetA, EnumSet.of(TestFlags.WARM_UP));
-        testRuntime(testInfo, supportedExtensionsSubsetSetA, EnumSet.noneOf(TestFlags.class));
+        testRuntime(testInfo, supportedExtensionsSubsetSetA, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir()));
+        testRuntime(testInfo, supportedExtensionsSubsetSetA, EnumSet.noneOf(TestFlags.class),new File(getArtifactGeneBaseDir()));
     }
 
     @Test
     public void manyExtensionsSetB(TestInfo testInfo) throws Exception {
-        testRuntime(testInfo, supportedExtensionsSubsetSetB, EnumSet.of(TestFlags.WARM_UP));
-        testRuntime(testInfo, supportedExtensionsSubsetSetB, EnumSet.noneOf(TestFlags.class));
+        testRuntime(testInfo, supportedExtensionsSubsetSetB, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir()));
+        testRuntime(testInfo, supportedExtensionsSubsetSetB, EnumSet.noneOf(TestFlags.class), new File(getArtifactGeneBaseDir()));
+    }
+
+    @Test
+    public void specialCharsOnPath(TestInfo testInfo) throws Exception {
+        String[] ext = supportedExtensionsSubsetSetA;
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "  "));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), ",;"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "~!@"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "#$%"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "^&*"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "()"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "_+"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "ěščřžýááíéůú"));
+        testRuntime(testInfo, ext, EnumSet.of(TestFlags.WARM_UP), new File(getArtifactGeneBaseDir(), "元気かい"));
     }
 }
