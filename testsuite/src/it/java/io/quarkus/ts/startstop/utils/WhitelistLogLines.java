@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
  */
 public enum WhitelistLogLines {
     JAX_RS_MINIMAL(new Pattern[]{
+            Pattern.compile(".*--no-server.*"),
             // Some artifacts names...
             Pattern.compile(".*maven-error-diagnostics.*"),
             Pattern.compile(".*errorprone.*"),
